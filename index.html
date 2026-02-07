@@ -2,68 +2,61 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Bold Shape Collage Maker (No Text)</title>
+    <title>Pro Shape Collage Maker - Click to Replace</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap');
-
+        * { box-sizing: border-box; }
         body { font-family: 'Prompt', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; color: #2d3436; }
-        
         .main-container { display: flex; gap: 30px; align-items: flex-start; max-width: 1200px; }
-
-        /* แผงควบคุมและคู่มือ */
         .sidebar { width: 320px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: sticky; top: 20px; }
-        
-        .ui-group { margin-bottom: 20px; }
+        .ui-group { margin-bottom: 15px; }
         label { font-weight: 600; display: block; margin-bottom: 8px; color: #636e72; }
-        select, input, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dfe6e9; font-size: 14px; box-sizing: border-box; }
+        select, input, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dfe6e9; font-size: 14px; }
         
-        /* สรุปจำนวนรูป */
-        .count-badge { background: #ebfbee; color: #2f9e44; padding: 15px; border-radius: 10px; border: 1px dashed #b2f2bb; text-align: center; margin-bottom: 20px; font-weight: 600; }
-        .count-badge span { font-size: 28px; display: block; }
-
-        button.btn-save { background: #2d3436; color: white; border: none; cursor: pointer; font-weight: 600; font-size: 16px; margin-top: 10px; transition: 0.2s; }
+        .btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        button { cursor: pointer; transition: 0.2s; }
+        button.btn-clear { background: #fff; color: #e03131; border: 1px solid #ffc9c9; }
+        button.btn-shuffle { background: #f1f3f5; color: #1c7ed6; border: 1px solid #d0ebff; }
+        button.btn-save { background: #2d3436; color: white; border: none; font-weight: 600; font-size: 16px; margin-top: 10px; }
         button.btn-save:hover { background: #000; transform: translateY(-2px); }
 
-        /* ตารางสรุป */
-        .summary-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
-        .summary-table td { border-bottom: 1px solid #eee; padding: 8px 5px; text-align: left; }
+        .count-badge { background: #ebfbee; color: #2f9e44; padding: 15px; border-radius: 10px; border: 1px dashed #b2f2bb; text-align: center; margin-bottom: 15px; font-weight: 600; }
+        .count-badge span { font-size: 28px; display: block; }
 
-        /* --- พื้นที่ A4 : ล็อกขนาดและจัดรูปทรงกึ่งกลาง --- */
-        #a4-canvas {
-            width: 595px; height: 842px; background: white; 
-            display: flex; align-items: center; justify-content: center; /* จัดรูปทรงไว้กลางหน้ากระดาษเป๊ะๆ */
-            box-sizing: border-box; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.1);
-        }
-
-        .shape-grid { 
-            display: grid; 
-            grid-template-columns: repeat(7, 65px); 
-            grid-template-rows: repeat(9, 65px); 
-            gap: 10px; 
-        }
-
+        #a4-canvas { width: 595px; height: 842px; background: white; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
+        .shape-grid { display: grid; grid-template-columns: repeat(7, 65px); grid-template-rows: repeat(9, 65px); gap: 10px; }
+        
         .slot { width: 65px; height: 65px; background: transparent; }
-        .slot.active { background: #fff; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; }
-        .slot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .slot.active { 
+            background-color: #f8f9fa; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            border-radius: 2px; background-size: cover; background-position: center; background-repeat: no-repeat; 
+            cursor: pointer; position: relative;
+        }
+        /* เอฟเฟกต์ตอนเอาเมาส์ชี้เพื่อให้รู้ว่ากดเปลี่ยนรูปได้ */
+        .slot.active:hover::after {
+            content: 'เปลี่ยนรูป'; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); color: white; display: flex; align-items: center;
+            justify-content: center; font-size: 10px; border-radius: 2px;
+        }
     </style>
 </head>
 <body>
 
-    <h2 style="margin-bottom: 20px;">🖼️ Shape Collage Maker (Clean A4)</h2>
+    <h2 style="margin-bottom: 20px;">🖼️ Pro Collage Maker (Replace Anywhere)</h2>
 
     <div class="main-container">
         <div class="sidebar">
             <div class="count-badge">
-                <small>รูปทรงนี้ใช้รูปภาพทั้งหมด</small>
+                <small>จำนวนรูปที่ใช้</small>
                 <span id="photoCount">0</span>
                 <small>ใบ</small>
             </div>
 
             <div class="ui-group">
-                <label>1. เลือกรูปทรงที่ต้องการ</label>
+                <label>1. เลือกรูปทรง</label>
                 <select id="shapeSelect">
-                    <option value="heart">❤️ หัวใจ (Heart)</option>
+                    <option value="heart">❤️ หัวใจ</option>
                     <option value="1">เลข 1</option>
                     <option value="2">เลข 2</option>
                     <option value="3">เลข 3</option>
@@ -78,27 +71,25 @@
             </div>
 
             <div class="ui-group">
-                <label>2. เลือกรูปจากเครื่อง</label>
+                <label>2. อัปโหลดรูปทั้งหมด (Bulk)</label>
                 <input type="file" id="imageInput" multiple accept="image/*">
+                <small style="color: #888; font-size: 11px;">* หรือคลิกที่รูปในกระดาษเพื่อเปลี่ยนรายใบ</small>
             </div>
 
-            <button class="btn-save" onclick="saveImage()">💾 บันทึกรูป A4 (No Text)</button>
+            <div class="btn-row">
+                <button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับตำแหน่ง</button>
+                <button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูปทั้งหมด</button>
+            </div>
 
-            <table class="summary-table">
-                <tbody>
-                    <tr><td>❤️ Heart: 41 รูป</td><td>เลข 5: 30 รูป</td></tr>
-                    <tr><td>เลข 1: 23 รูป</td><td>เลข 6: 31 รูป</td></tr>
-                    <tr><td>เลข 2: 26 รูป</td><td>เลข 7: 23 รูป</td></tr>
-                    <tr><td>เลข 3: 28 รูป</td><td>เลข 8: 35 รูป</td></tr>
-                    <tr><td>เลข 4: 31 รูป</td><td>เลข 9: 28 รูป</td></tr>
-                </tbody>
-            </table>
+            <button class="btn-save" onclick="saveImage()">💾 บันทึกรูป A4</button>
         </div>
 
         <div id="a4-canvas">
             <div class="shape-grid" id="gridContainer"></div>
         </div>
     </div>
+
+    <input type="file" id="singleReplaceInput" accept="image/*" style="display: none;">
 
 <script>
     const patterns = {
@@ -117,7 +108,9 @@
 
     const grid = document.getElementById('gridContainer');
     const photoCountLabel = document.getElementById('photoCount');
+    const singleReplaceInput = document.getElementById('singleReplaceInput');
     let activeSlots = [];
+    let targetSlot = null; // เก็บว่ากำลังจะเปลี่ยนรูปที่ช่องไหน
 
     function build(shapeKey) {
         grid.innerHTML = '';
@@ -126,12 +119,33 @@
             row.split('').forEach(char => {
                 const div = document.createElement('div');
                 div.className = 'slot' + (char === 'X' ? ' active' : '');
+                
+                // ถ้าเป็นช่องที่ใส่รูปได้ ให้ใส่ระบบคลิกเพื่อเปลี่ยนรูป
+                if(char === 'X') {
+                    div.onclick = function() {
+                        targetSlot = div;
+                        singleReplaceInput.click(); // เรียกหน้าต่างเลือกรูป
+                    };
+                    activeSlots.push(div);
+                }
                 grid.appendChild(div);
-                if(char === 'X') activeSlots.push(div);
             });
         });
         photoCountLabel.innerText = activeSlots.length;
     }
+
+    // จัดการการเปลี่ยนรูปรายช่อง
+    singleReplaceInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file && targetSlot) {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                targetSlot.style.backgroundImage = `url(${ev.target.result})`;
+            };
+            reader.readAsDataURL(file);
+        }
+        e.target.value = ''; // Reset input
+    };
 
     document.getElementById('shapeSelect').onchange = (e) => build(e.target.value);
     
@@ -143,15 +157,36 @@
                 reader.onload = (ev) => res(ev.target.result);
                 reader.readAsDataURL(files[i]);
             });
-            activeSlots[i].innerHTML = `<img src="${url}">`;
+            activeSlots[i].style.backgroundImage = `url(${url})`;
         }
     };
 
+    function clearPhotos() {
+        if(confirm("ต้องการลบรูปภาพทั้งหมดใช่ไหม?")) {
+            activeSlots.forEach(slot => slot.style.backgroundImage = '');
+            document.getElementById('imageInput').value = '';
+        }
+    }
+
+    function shufflePhotos() {
+        const currentImages = activeSlots
+            .map(slot => slot.style.backgroundImage)
+            .filter(img => img !== '');
+        if (currentImages.length < 2) return;
+        for (let i = currentImages.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [currentImages[i], currentImages[j]] = [currentImages[j], currentImages[i]];
+        }
+        activeSlots.forEach((slot, index) => {
+            slot.style.backgroundImage = currentImages[index] || '';
+        });
+    }
+
     function saveImage() {
         const area = document.getElementById('a4-canvas');
-        html2canvas(area, { scale: 4, useCORS: true }).then(canvas => {
+        html2canvas(area, { scale: 3, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `shape-collage-${document.getElementById('shapeSelect').value}.png`;
+            link.download = `my-collage.png`;
             link.href = canvas.toDataURL();
             link.click();
         });
