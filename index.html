@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultra Clear Shape Collage</title>
+    <title>Ultra HD Shape Collage - Final Version</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap');
@@ -14,16 +14,13 @@
             margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
         }
 
-        .main-container { 
-            display: flex; gap: 20px; align-items: flex-start; 
-            max-width: 1400px; width: 100%;
-        }
+        .main-container { display: flex; gap: 20px; align-items: flex-start; max-width: 1400px; width: 100%; }
 
-        /* แผงควบคุม */
+        /* แผงควบคุม (Sidebar) */
         .sidebar { 
-            width: 350px; background: white; padding: 25px; 
-            border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            border: 1px solid #eee; position: sticky; top: 10px;
+            width: 350px; background: white; padding: 25px; border-radius: 20px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eee; 
+            position: sticky; top: 10px;
         }
 
         .ui-group { margin-bottom: 15px; }
@@ -36,22 +33,16 @@
         button.btn-shuffle { background: #f8f9fa; color: #1c7ed6; border: 1px solid #d0ebff; }
         button.btn-save { background: #2d3436; color: white; border: none; font-size: 16px; margin-top: 10px; padding: 15px; }
 
-        /* ส่วนแสดงผล (Canvas) */
-        .canvas-container {
-            flex-grow: 1; display: flex; justify-content: center;
-            width: 100%; overflow: hidden; background: #e2e8f0; border-radius: 10px; padding: 20px;
-        }
+        /* พื้นที่พรีวิว (Canvas) */
+        .canvas-container { flex-grow: 1; display: flex; justify-content: center; width: 100%; overflow: hidden; background: #e2e8f0; border-radius: 10px; padding: 20px; }
 
-        /* ขนาด A4 จริงที่ใหญ่ขึ้นเพื่อความชัด (1240 x 1754 px) */
         #a4-canvas { 
             width: 1240px; height: 1754px; background: white; 
             display: flex; align-items: center; justify-content: center; 
             position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.1); 
             transform-origin: top center;
-            image-rendering: -webkit-optimize-contrast; /* บังคับให้รูปคมชัด */
         }
 
-        /* ปรับกริดให้ใหญ่ตามกระดาษ */
         .shape-grid { display: grid; grid-template-columns: repeat(7, 130px); grid-template-rows: repeat(9, 130px); gap: 20px; }
         
         .slot { width: 130px; height: 130px; background: transparent; }
@@ -62,37 +53,25 @@
             cursor: pointer; position: relative;
         }
 
-        /* ย่อพรีวิวให้พอดีหน้าจอ */
-        @media (min-width: 901px) {
-            #a4-canvas { transform: scale(0.45); margin-bottom: -950px; }
-        }
-
+        /* ปรับสัดส่วนตามหน้าจอ */
+        @media (min-width: 901px) { #a4-canvas { transform: scale(0.45); margin-bottom: -950px; } }
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
             .sidebar { width: 100%; order: 2; margin-top: 10px; }
             .canvas-container { order: 1; min-height: 500px; padding: 10px; }
-            #a4-canvas { transform: scale(0.28); margin-bottom: -1250px; } /* ย่อให้พอดีมือถือ */
-        }
-        
-        @media (max-width: 450px) {
-            #a4-canvas { transform: scale(0.22); margin-bottom: -1350px; }
+            #a4-canvas { transform: scale(0.28); margin-bottom: -1250px; }
         }
     </style>
 </head>
 <body>
 
-    <h2 style="margin: 10px 0 15px 0;">🖼️ Ultra Clear Collage Maker</h2>
+    <h2 style="margin: 10px 0 15px 0;">🖼️ Ultra Clear Collage Pro</h2>
 
     <div class="main-container">
-        <div class="canvas-container">
-            <div id="a4-canvas">
-                <div class="shape-grid" id="gridContainer"></div>
-            </div>
-        </div>
-
+        <div class="canvas-container"><div id="a4-canvas"><div class="shape-grid" id="gridContainer"></div></div></div>
         <div class="sidebar">
             <div class="ui-group">
-                <label>1. เลือกรูปทรง</label>
+                <label>1. เลือกรูปทรง (เปลี่ยนได้ทุกเลข)</label>
                 <select id="shapeSelect">
                     <option value="heart">❤️ หัวใจ</option>
                     <option value="1">เลข 1</option>
@@ -108,8 +87,8 @@
                 </select>
             </div>
             <div class="ui-group"><label>2. อัปโหลดรูปภาพ</label><input type="file" id="imageInput" multiple accept="image/*"></div>
-            <div class="btn-row"><button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับตำแหน่ง</button><button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูป</button></div>
-            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูปชัดพิเศษ (Print Ready)</button>
+            <div class="btn-row"><button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับที่</button><button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูป</button></div>
+            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูปชัดพิเศษ</button>
         </div>
     </div>
 
@@ -137,6 +116,7 @@
 
     function build(shapeKey) {
         grid.innerHTML = ''; activeSlots = [];
+        if(!patterns[shapeKey]) return;
         patterns[shapeKey].forEach(row => {
             row.split('').forEach(char => {
                 const div = document.createElement('div');
@@ -160,6 +140,8 @@
         e.target.value = '';
     };
 
+    document.getElementById('shapeSelect').onchange = (e) => build(e.target.value);
+    
     document.getElementById('imageInput').onchange = async (e) => {
         const files = Array.from(e.target.files);
         for(let i=0; i<files.length && i<activeSlots.length; i++) {
@@ -187,17 +169,13 @@
     function saveImage() {
         const btn = document.getElementById('saveBtn');
         const area = document.getElementById('a4-canvas');
-        btn.innerText = "⏳ กำลังบันทึกภาพความละเอียดสูง..."; btn.disabled = true;
-
+        btn.innerText = "⏳ กำลังประมวลผล..."; btn.disabled = true;
         const originalTransform = area.style.transform;
         area.style.transform = "none";
-
         setTimeout(() => {
             html2canvas(area, { 
-                scale: 2, // 2x จากความละเอียดที่สูงอยู่แล้ว จะได้ภาพที่ใหญ่มาก
-                useCORS: true, 
-                backgroundColor: "#ffffff",
-                width: 1240, height: 1754
+                scale: 2, useCORS: true, backgroundColor: "#ffffff", 
+                width: 1240, height: 1754 
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `clear-collage-${new Date().getTime()}.png`;
@@ -205,14 +183,9 @@
                 link.click();
                 area.style.transform = originalTransform;
                 btn.innerText = "💾 บันทึกรูปภาพ A4"; btn.disabled = false;
-            }).catch(() => {
-                alert("เกิดข้อผิดพลาดในการบันทึก");
-                area.style.transform = originalTransform;
-                btn.disabled = false;
-            });
+            }).catch(() => { btn.disabled = false; area.style.transform = originalTransform; });
         }, 800);
     }
-
     build('heart');
 </script>
 </body>
