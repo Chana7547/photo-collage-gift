@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ultra HD Shape Collage - Final Version</title>
+    <title>Pro Collage Maker - Close Grid & Ultra HD</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap');
@@ -16,7 +16,7 @@
 
         .main-container { display: flex; gap: 20px; align-items: flex-start; max-width: 1400px; width: 100%; }
 
-        /* แผงควบคุม (Sidebar) */
+        /* แผงควบคุม */
         .sidebar { 
             width: 350px; background: white; padding: 25px; border-radius: 20px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eee; 
@@ -33,22 +33,24 @@
         button.btn-shuffle { background: #f8f9fa; color: #1c7ed6; border: 1px solid #d0ebff; }
         button.btn-save { background: #2d3436; color: white; border: none; font-size: 16px; margin-top: 10px; padding: 15px; }
 
-        /* พื้นที่พรีวิว (Canvas) */
+        /* พื้นที่พรีวิว */
         .canvas-container { flex-grow: 1; display: flex; justify-content: center; width: 100%; overflow: hidden; background: #e2e8f0; border-radius: 10px; padding: 20px; }
 
+        /* พื้นหลังสีขาว 100% */
         #a4-canvas { 
-            width: 1240px; height: 1754px; background: white; 
+            width: 1240px; height: 1754px; background-color: #ffffff !important; 
             display: flex; align-items: center; justify-content: center; 
             position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.1); 
             transform-origin: top center;
         }
 
-        .shape-grid { display: grid; grid-template-columns: repeat(7, 130px); grid-template-rows: repeat(9, 130px); gap: 20px; }
+        /* ปรับระยะห่าง (Gap) ให้ชิดขึ้นเหลือ 8px */
+        .shape-grid { display: grid; grid-template-columns: repeat(7, 130px); grid-template-rows: repeat(9, 130px); gap: 8px; }
         
         .slot { width: 130px; height: 130px; background: transparent; }
         .slot.active { 
-            background-color: #f8f9fa; border: 8px solid white; 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); border-radius: 4px; 
+            background-color: #f8f9fa; border: 6px solid white; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 4px; 
             background-size: cover; background-position: center; 
             cursor: pointer; position: relative;
         }
@@ -65,13 +67,13 @@
 </head>
 <body>
 
-    <h2 style="margin: 10px 0 15px 0;">🖼️ Ultra Clear Collage Pro</h2>
+    <h2 style="margin: 10px 0 15px 0;">🖼️ Pro Collage Maker (Close Grid)</h2>
 
     <div class="main-container">
         <div class="canvas-container"><div id="a4-canvas"><div class="shape-grid" id="gridContainer"></div></div></div>
         <div class="sidebar">
             <div class="ui-group">
-                <label>1. เลือกรูปทรง (เปลี่ยนได้ทุกเลข)</label>
+                <label>1. เลือกรูปทรง</label>
                 <select id="shapeSelect">
                     <option value="heart">❤️ หัวใจ</option>
                     <option value="1">เลข 1</option>
@@ -88,7 +90,7 @@
             </div>
             <div class="ui-group"><label>2. อัปโหลดรูปภาพ</label><input type="file" id="imageInput" multiple accept="image/*"></div>
             <div class="btn-row"><button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับที่</button><button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูป</button></div>
-            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูปชัดพิเศษ</button>
+            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูป (Ultra HD)</button>
         </div>
     </div>
 
@@ -169,22 +171,31 @@
     function saveImage() {
         const btn = document.getElementById('saveBtn');
         const area = document.getElementById('a4-canvas');
-        btn.innerText = "⏳ กำลังประมวลผล..."; btn.disabled = true;
+        btn.innerText = "⏳ กำลังประมวลผลชัดพิเศษ..."; btn.disabled = true;
+        
         const originalTransform = area.style.transform;
         area.style.transform = "none";
+
         setTimeout(() => {
             html2canvas(area, { 
-                scale: 2, useCORS: true, backgroundColor: "#ffffff", 
-                width: 1240, height: 1754 
+                scale: 2, 
+                useCORS: true, 
+                backgroundColor: "#ffffff", 
+                width: 1240, height: 1754,
+                logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `clear-collage-${new Date().getTime()}.png`;
+                link.download = `best-collage-${new Date().getTime()}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
                 area.style.transform = originalTransform;
-                btn.innerText = "💾 บันทึกรูปภาพ A4"; btn.disabled = false;
-            }).catch(() => { btn.disabled = false; area.style.transform = originalTransform; });
-        }, 800);
+                btn.innerText = "💾 บันทึกรูป (Ultra HD)"; btn.disabled = false;
+            }).catch(() => {
+                alert("เกิดข้อผิดพลาด");
+                area.style.transform = originalTransform;
+                btn.disabled = false;
+            });
+        }, 1200); // เพิ่มเวลาเป็น 1.2 วินาทีเพื่อให้เรนเดอร์พื้นหลังขาวได้ครบถ้วน
     }
     build('heart');
 </script>
