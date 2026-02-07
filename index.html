@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pro Collage Maker - Close Grid & Ultra HD</title>
+    <title>Super 4K Shape Collage - Ultimate Sharpness</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: 'Prompt', sans-serif; background: #f0f2f5; 
+            font-family: 'Prompt', sans-serif; background: #f4f6f8; 
             margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
         }
 
@@ -31,43 +31,45 @@
         button { cursor: pointer; transition: 0.2s; font-weight: 600; }
         button.btn-clear { background: #fff; color: #e03131; border: 1px solid #ffc9c9; }
         button.btn-shuffle { background: #f8f9fa; color: #1c7ed6; border: 1px solid #d0ebff; }
-        button.btn-save { background: #2d3436; color: white; border: none; font-size: 16px; margin-top: 10px; padding: 15px; }
+        button.btn-save { background: #1a1a1a; color: white; border: none; font-size: 16px; margin-top: 10px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
         /* พื้นที่พรีวิว */
-        .canvas-container { flex-grow: 1; display: flex; justify-content: center; width: 100%; overflow: hidden; background: #e2e8f0; border-radius: 10px; padding: 20px; }
+        .canvas-container { flex-grow: 1; display: flex; justify-content: center; width: 100%; overflow: hidden; background: #ced4da; border-radius: 10px; padding: 20px; }
 
-        /* พื้นหลังสีขาว 100% */
+        /* A4 Canvas พร้อมคุณสมบัติเพิ่มความคมชัด */
         #a4-canvas { 
-            width: 1240px; height: 1754px; background-color: #ffffff !important; 
+            width: 595px; height: 842px; background-color: #ffffff !important; 
             display: flex; align-items: center; justify-content: center; 
             position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.1); 
             transform-origin: top center;
+            /* เพิ่มความคมชัดสูงสุด */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            -ms-interpolation-mode: nearest-neighbor;
         }
 
-        /* ปรับระยะห่าง (Gap) ให้ชิดขึ้นเหลือ 8px */
-        .shape-grid { display: grid; grid-template-columns: repeat(7, 130px); grid-template-rows: repeat(9, 130px); gap: 8px; }
+        .shape-grid { display: grid; grid-template-columns: repeat(7, 65px); grid-template-rows: repeat(9, 65px); gap: 8px; }
         
-        .slot { width: 130px; height: 130px; background: transparent; }
+        .slot { width: 65px; height: 65px; background: transparent; }
         .slot.active { 
-            background-color: #f8f9fa; border: 6px solid white; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08); border-radius: 4px; 
+            background-color: #f8f9fa; border: 4px solid white; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 2px; 
             background-size: cover; background-position: center; 
             cursor: pointer; position: relative;
         }
 
-        /* ปรับสัดส่วนตามหน้าจอ */
-        @media (min-width: 901px) { #a4-canvas { transform: scale(0.45); margin-bottom: -950px; } }
+        @media (min-width: 901px) { #a4-canvas { transform: scale(0.8); margin-bottom: -150px; } }
         @media (max-width: 900px) {
             .main-container { flex-direction: column; }
             .sidebar { width: 100%; order: 2; margin-top: 10px; }
-            .canvas-container { order: 1; min-height: 500px; padding: 10px; }
-            #a4-canvas { transform: scale(0.28); margin-bottom: -1250px; }
+            .canvas-container { order: 1; min-height: 480px; padding: 10px; }
+            #a4-canvas { transform: scale(0.55); margin-bottom: -380px; }
         }
     </style>
 </head>
 <body>
 
-    <h2 style="margin: 10px 0 15px 0;">🖼️ Pro Collage Maker (Close Grid)</h2>
+    <h2 style="margin: 10px 0 15px 0;">🖼️ Super 4K Collage Maker</h2>
 
     <div class="main-container">
         <div class="canvas-container"><div id="a4-canvas"><div class="shape-grid" id="gridContainer"></div></div></div>
@@ -90,7 +92,7 @@
             </div>
             <div class="ui-group"><label>2. อัปโหลดรูปภาพ</label><input type="file" id="imageInput" multiple accept="image/*"></div>
             <div class="btn-row"><button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับที่</button><button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูป</button></div>
-            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูป (Ultra HD)</button>
+            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูปชัดพิเศษ (Super 4K)</button>
         </div>
     </div>
 
@@ -171,31 +173,32 @@
     function saveImage() {
         const btn = document.getElementById('saveBtn');
         const area = document.getElementById('a4-canvas');
-        btn.innerText = "⏳ กำลังประมวลผลชัดพิเศษ..."; btn.disabled = true;
+        btn.innerText = "⏳ กำลังบันทึกความละเอียดสูงพิเศษ..."; btn.disabled = true;
         
         const originalTransform = area.style.transform;
         area.style.transform = "none";
 
+        // เพิ่มการหน่วงเวลาเป็น 2 วินาทีเพื่อให้แน่ใจว่าหน่วยความจำถูกจัดสรรเรียบร้อย
         setTimeout(() => {
             html2canvas(area, { 
-                scale: 2, 
+                scale: 6, // เพิ่มความชัด 2 เท่าจากเดิม (x3 -> x6 หรือ x4 -> x6)
                 useCORS: true, 
                 backgroundColor: "#ffffff", 
-                width: 1240, height: 1754,
+                width: 595, height: 842,
                 logging: false
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `best-collage-${new Date().getTime()}.png`;
+                link.download = `Super4K-collage-${new Date().getTime()}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
                 area.style.transform = originalTransform;
-                btn.innerText = "💾 บันทึกรูป (Ultra HD)"; btn.disabled = false;
+                btn.innerText = "💾 บันทึกรูป (Super 4K)"; btn.disabled = false;
             }).catch(() => {
-                alert("เกิดข้อผิดพลาด");
+                alert("หน่วยความจำไม่เพียงพอ กรุณาลองใหม่อีกครั้ง");
                 area.style.transform = originalTransform;
-                btn.disabled = false;
+                btn.innerText = "💾 บันทึกรูป (Super 4K)"; btn.disabled = false;
             });
-        }, 1200); // เพิ่มเวลาเป็น 1.2 วินาทีเพื่อให้เรนเดอร์พื้นหลังขาวได้ครบถ้วน
+        }, 2000);
     }
     build('heart');
 </script>
