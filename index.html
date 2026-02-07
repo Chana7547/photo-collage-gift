@@ -2,49 +2,102 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>Ultimate Shape Collage - Drag & Swap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pro Collage Maker - Stable & Mobile Ready</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap');
-        * { box-sizing: border-box; }
-        body { font-family: 'Prompt', sans-serif; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; color: #2d3436; }
-        .main-container { display: flex; gap: 30px; align-items: flex-start; max-width: 1200px; }
-        .sidebar { width: 320px; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; position: sticky; top: 20px; }
-        .ui-group { margin-bottom: 15px; }
-        label { font-weight: 600; display: block; margin-bottom: 8px; color: #636e72; }
-        select, input, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dfe6e9; font-size: 14px; }
-        .btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        button { cursor: pointer; transition: 0.2s; }
-        button.btn-clear { background: #fff; color: #e03131; border: 1px solid #ffc9c9; }
-        button.btn-shuffle { background: #f1f3f5; color: #1c7ed6; border: 1px solid #d0ebff; }
-        button.btn-save { background: #2d3436; color: white; border: none; font-weight: 600; font-size: 16px; margin-top: 10px; }
-        button.btn-save:hover { background: #000; transform: translateY(-2px); }
-        .count-badge { background: #ebfbee; color: #2f9e44; padding: 15px; border-radius: 10px; border: 1px dashed #b2f2bb; text-align: center; margin-bottom: 15px; font-weight: 600; }
-        .count-badge span { font-size: 28px; display: block; }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: 'Prompt', sans-serif; background: #f1f3f5; 
+            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
+            color: #2d3436;
+        }
 
-        /* พื้นที่ A4 */
-        #a4-canvas { width: 595px; height: 842px; background: white; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.1); }
+        .main-container { 
+            display: flex; gap: 20px; align-items: flex-start; 
+            max-width: 1200px; width: 100%;
+        }
+
+        /* Sidebar: ควบคุมการทำงาน */
+        .sidebar { 
+            width: 320px; background: white; padding: 20px; 
+            border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            border: 1px solid #eee; position: sticky; top: 10px;
+        }
+
+        .ui-group { margin-bottom: 15px; }
+        label { font-weight: 600; display: block; margin-bottom: 8px; font-size: 14px; color: #636e72; }
+        
+        select, input, button { 
+            width: 100%; padding: 12px; border-radius: 12px; 
+            border: 1px solid #dfe6e9; font-size: 14px; font-family: inherit;
+        }
+
+        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        button { cursor: pointer; transition: 0.2s; font-weight: 600; }
+        button.btn-clear { background: #fff; color: #e03131; border: 1px solid #ffc9c9; }
+        button.btn-shuffle { background: #f8f9fa; color: #1c7ed6; border: 1px solid #d0ebff; }
+        button.btn-save { 
+            background: #2d3436; color: white; border: none; font-size: 16px; 
+            margin-top: 10px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .count-badge { 
+            background: #ebfbee; color: #2f9e44; padding: 10px; 
+            border-radius: 12px; text-align: center; margin-bottom: 15px; 
+        }
+        .count-badge span { font-size: 24px; font-weight: 600; display: block; }
+
+        /* Canvas: พื้นที่แสดงผล */
+        .canvas-container {
+            flex-grow: 1; display: flex; justify-content: center;
+            width: 100%; overflow: hidden;
+        }
+
+        #a4-canvas { 
+            width: 595px; height: 842px; background: white; 
+            display: flex; align-items: center; justify-content: center; 
+            position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.08); 
+            transform-origin: top center;
+        }
+
         .shape-grid { display: grid; grid-template-columns: repeat(7, 65px); grid-template-rows: repeat(9, 65px); gap: 10px; }
         
         .slot { width: 65px; height: 65px; background: transparent; }
         .slot.active { 
-            background-color: #f8f9fa; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-            border-radius: 2px; background-size: cover; background-position: center; background-repeat: no-repeat; 
+            background-color: #f8f9fa; border: 4px solid white; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 2px; 
+            background-size: cover; background-position: center; 
             cursor: grab; position: relative;
         }
-        .slot.active:active { cursor: grabbing; }
-        .slot.dragging { opacity: 0.4; border: 2px dashed #1c7ed6; }
-        .slot.drag-over { border: 2px solid #1c7ed6; transform: scale(1.05); }
+        .slot.dragging { opacity: 0.4; }
+
+        /* ปรับแต่ง Responsive สำหรับมือถือ */
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; align-items: center; }
+            .sidebar { width: 100%; position: static; order: 2; margin-top: 20px; }
+            .canvas-container { order: 1; min-height: 450px; }
+            #a4-canvas { transform: scale(0.5); margin-bottom: -421px; } 
+        }
     </style>
 </head>
 <body>
 
-    <h2 style="margin-bottom: 20px;">🖼️ Ultimate Collage Maker (Drag & Swap)</h2>
+    <h2 style="margin: 10px 0 20px 0;">🖼️ Pro Collage Maker</h2>
 
     <div class="main-container">
+        <div class="canvas-container">
+            <div id="a4-canvas">
+                <div class="shape-grid" id="gridContainer"></div>
+            </div>
+        </div>
+
         <div class="sidebar">
             <div class="count-badge">
-                <small>จำนวนรูปที่ใช้</small>
+                <small>จำนวนรูปภาพที่ใช้</small>
                 <span id="photoCount">0</span>
                 <small>ใบ</small>
             </div>
@@ -67,21 +120,17 @@
             </div>
 
             <div class="ui-group">
-                <label>2. จัดการรูปภาพ</label>
+                <label>2. อัปโหลดรูปภาพ</label>
                 <input type="file" id="imageInput" multiple accept="image/*">
-                <p style="font-size: 11px; color: #888; margin-top: 5px;">* คลิกเพื่อเปลี่ยนรูปรายใบ / ลากรูปเพื่อสลับตำแหน่ง</p>
+                <p style="font-size: 11px; color: #888; margin-top: 5px;">* คลิกที่รูปเพื่อเปลี่ยน / ลากเพื่อสลับตำแหน่ง</p>
             </div>
 
             <div class="btn-row">
-                <button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับทั้งหมด</button>
-                <button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างทั้งหมด</button>
+                <button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับตำแหน่ง</button>
+                <button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูป</button>
             </div>
 
-            <button class="btn-save" onclick="saveImage()">💾 บันทึกรูป A4</button>
-        </div>
-
-        <div id="a4-canvas">
-            <div class="shape-grid" id="gridContainer"></div>
+            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูปภาพ A4</button>
         </div>
     </div>
 
@@ -106,49 +155,30 @@
     const photoCountLabel = document.getElementById('photoCount');
     const singleReplaceInput = document.getElementById('singleReplaceInput');
     let activeSlots = [];
-    let sourceSlot = null; // ตัวแปรเก็บช่องที่กำลังถูกลาก
+    let sourceSlot = null;
 
     function build(shapeKey) {
-        grid.innerHTML = '';
-        activeSlots = [];
+        grid.innerHTML = ''; activeSlots = [];
         patterns[shapeKey].forEach(row => {
             row.split('').forEach(char => {
                 const div = document.createElement('div');
                 div.className = 'slot' + (char === 'X' ? ' active' : '');
-                
                 if(char === 'X') {
-                    div.draggable = true; // ทำให้ลากได้
-                    
-                    // คลิกเพื่อเปลี่ยนรูป
-                    div.onclick = (e) => {
-                        if (e.target.style.backgroundImage) {
-                            sourceSlot = div;
-                            singleReplaceInput.click();
-                        }
-                    };
-
-                    // ระบบ Drag & Drop
-                    div.ondragstart = (e) => {
-                        sourceSlot = div;
-                        div.classList.add('dragging');
-                    };
+                    div.draggable = true;
+                    // คลิกเพื่อเปลี่ยนรูปรายใบ
+                    div.onclick = (e) => { sourceSlot = div; singleReplaceInput.click(); };
+                    // ระบบลากวาง (Drag and Drop)
+                    div.ondragstart = (e) => { sourceSlot = div; div.classList.add('dragging'); };
                     div.ondragend = () => div.classList.remove('dragging');
-                    div.ondragover = (e) => {
-                        e.preventDefault();
-                        div.classList.add('drag-over');
-                    };
-                    div.ondragleave = () => div.classList.remove('drag-over');
+                    div.ondragover = (e) => e.preventDefault();
                     div.ondrop = (e) => {
                         e.preventDefault();
-                        div.classList.remove('drag-over');
                         if (sourceSlot !== div) {
-                            // สลับ Background Image
-                            const tempImg = div.style.backgroundImage;
+                            const temp = div.style.backgroundImage;
                             div.style.backgroundImage = sourceSlot.style.backgroundImage;
-                            sourceSlot.style.backgroundImage = tempImg;
+                            sourceSlot.style.backgroundImage = temp;
                         }
                     };
-
                     activeSlots.push(div);
                 }
                 grid.appendChild(div);
@@ -157,35 +187,32 @@
         photoCountLabel.innerText = activeSlots.length;
     }
 
+    // ฟังก์ชันเปลี่ยนรูปรายใบ
     singleReplaceInput.onchange = (e) => {
         const file = e.target.files[0];
         if (file && sourceSlot) {
-            const reader = new FileReader();
-            reader.onload = (ev) => sourceSlot.style.backgroundImage = `url(${ev.target.result})`;
-            reader.readAsDataURL(file);
+            const r = new FileReader();
+            r.onload = (ev) => sourceSlot.style.backgroundImage = `url(${ev.target.result})`;
+            r.readAsDataURL(file);
         }
         e.target.value = '';
     };
 
-    document.getElementById('shapeSelect').onchange = (e) => build(e.target.value);
-    
+    // อัปโหลดรูปภาพทั้งหมด
     document.getElementById('imageInput').onchange = async (e) => {
         const files = Array.from(e.target.files);
         for(let i=0; i<files.length && i<activeSlots.length; i++) {
             const url = await new Promise(res => {
-                const reader = new FileReader();
-                reader.onload = (ev) => res(ev.target.result);
-                reader.readAsDataURL(files[i]);
+                const r = new FileReader();
+                r.onload = (ev) => res(ev.target.result);
+                r.readAsDataURL(files[i]);
             });
             activeSlots[i].style.backgroundImage = `url(${url})`;
         }
     };
 
     function clearPhotos() {
-        if(confirm("ต้องการล้างรูปทั้งหมด?")) {
-            activeSlots.forEach(s => s.style.backgroundImage = '');
-            document.getElementById('imageInput').value = '';
-        }
+        if(confirm("ล้างรูปทั้งหมด?")) activeSlots.forEach(s => s.style.backgroundImage = '');
     }
 
     function shufflePhotos() {
@@ -199,12 +226,34 @@
     }
 
     function saveImage() {
-        html2canvas(document.getElementById('a4-canvas'), { scale: 3, useCORS: true }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = `my-collage.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        });
+        const btn = document.getElementById('saveBtn');
+        const area = document.getElementById('a4-canvas');
+        btn.innerText = "⏳ กำลังประมวลผล...";
+        btn.disabled = true;
+
+        const originalTransform = area.style.transform;
+        area.style.transform = "none"; // คืนค่าขนาดจริงก่อนเซฟ
+
+        setTimeout(() => {
+            html2canvas(area, { 
+                scale: 3, // ความชัดระดับ 3 เหมาะกับพิมพ์และเสถียรบนมือถือ
+                useCORS: true, 
+                backgroundColor: "#ffffff",
+                width: 595, height: 842
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `collage-${new Date().getTime()}.png`;
+                link.href = canvas.toDataURL('image/png', 0.9);
+                link.click();
+                area.style.transform = originalTransform;
+                btn.innerText = "💾 บันทึกรูปภาพ A4";
+                btn.disabled = false;
+            }).catch(e => {
+                alert("เกิดข้อผิดพลาด กรุณาลองใหม่หรือลดจำนวนรูปลง");
+                area.style.transform = originalTransform;
+                btn.disabled = false;
+            });
+        }, 500);
     }
 
     build('heart');
