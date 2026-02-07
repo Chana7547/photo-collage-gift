@@ -3,77 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super 4K Shape Collage - Ultimate Sharpness</title>
+    <title>Super Zoom Collage Maker (Max Detail)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;600&display=swap');
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            font-family: 'Prompt', sans-serif; background: #f4f6f8; 
-            margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; 
+            font-family: 'Prompt', sans-serif; background: #f8f9fa; 
+            margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; 
         }
 
-        .main-container { display: flex; gap: 20px; align-items: flex-start; max-width: 1400px; width: 100%; }
+        .main-container { display: flex; gap: 25px; align-items: flex-start; max-width: 1400px; width: 100%; }
 
         /* แผงควบคุม */
         .sidebar { 
-            width: 350px; background: white; padding: 25px; border-radius: 20px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #eee; 
-            position: sticky; top: 10px;
+            width: 380px; background: white; padding: 25px; border-radius: 20px; 
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08); border: 1px solid #edf2f7;
+            position: sticky; top: 20px; z-index: 10;
         }
 
-        .ui-group { margin-bottom: 15px; }
-        label { font-weight: 600; display: block; margin-bottom: 8px; font-size: 14px; color: #636e72; }
-        select, input, button { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #dfe6e9; font-size: 14px; font-family: inherit; }
-        
-        .btn-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        button { cursor: pointer; transition: 0.2s; font-weight: 600; }
-        button.btn-clear { background: #fff; color: #e03131; border: 1px solid #ffc9c9; }
-        button.btn-shuffle { background: #f8f9fa; color: #1c7ed6; border: 1px solid #d0ebff; }
-        button.btn-save { background: #1a1a1a; color: white; border: none; font-size: 16px; margin-top: 10px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .ui-group { margin-bottom: 18px; }
+        label { font-weight: 700; display: block; margin-bottom: 8px; font-size: 15px; color: #4a5568; }
+        select, input, button { width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 15px; font-family: inherit; font-weight: 500; transition: 0.2s; }
+        select:focus, input:focus { border-color: #3182ce; outline: none; }
+
+        .btn-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        button { cursor: pointer; font-weight: 700; }
+        button.btn-clear { background: #fff5f5; color: #c53030; border: 2px solid #feb2b2; }
+        button.btn-shuffle { background: #ebf8ff; color: #2b6cb0; border: 2px solid #bee3f8; }
+        button.btn-save { background: #1a202c; color: white; border: none; font-size: 18px; margin-top: 10px; padding: 16px; box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+        button:active { transform: scale(0.98); }
 
         /* พื้นที่พรีวิว */
-        .canvas-container { flex-grow: 1; display: flex; justify-content: center; width: 100%; overflow: hidden; background: #ced4da; border-radius: 10px; padding: 20px; }
+        .canvas-container { flex-grow: 1; display: flex; justify-content: center; width: 100%; overflow: hidden; background: #cbd5e0; border-radius: 16px; padding: 20px; border: 2px solid #e2e8f0; }
 
-        /* A4 Canvas พร้อมคุณสมบัติเพิ่มความคมชัด */
+        /* --- หัวใจสำคัญ: ขนาด A4 ใหญ่คูณ 2 (1190x1684) --- */
         #a4-canvas { 
-            width: 595px; height: 842px; background-color: #ffffff !important; 
+            width: 1190px; height: 1684px;
+            background-color: #ffffff !important; 
             display: flex; align-items: center; justify-content: center; 
-            position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.1); 
+            position: relative; box-shadow: 0 0 60px rgba(0,0,0,0.1); 
             transform-origin: top center;
-            /* เพิ่มความคมชัดสูงสุด */
+            /* บังคับใช้คุณภาพสูงสุดในการเรนเดอร์ */
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
-            -ms-interpolation-mode: nearest-neighbor;
+            image-rendering: high-quality;
         }
 
-        .shape-grid { display: grid; grid-template-columns: repeat(7, 65px); grid-template-rows: repeat(9, 65px); gap: 8px; }
+        /* ปรับขนาดช่องให้ใหญ่ขึ้นตามสัดส่วน (ประมาณ 125px) */
+        .shape-grid { display: grid; grid-template-columns: repeat(7, 125px); grid-template-rows: repeat(9, 125px); gap: 15px; }
         
-        .slot { width: 65px; height: 65px; background: transparent; }
+        .slot { width: 125px; height: 125px; background: transparent; }
         .slot.active { 
-            background-color: #f8f9fa; border: 4px solid white; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 2px; 
+            background-color: #f8f9fa; border: 6px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-radius: 6px; 
             background-size: cover; background-position: center; 
             cursor: pointer; position: relative;
         }
 
-        @media (min-width: 901px) { #a4-canvas { transform: scale(0.8); margin-bottom: -150px; } }
-        @media (max-width: 900px) {
+        /* การย่อพรีวิวให้พอดีจอ */
+        @media (min-width: 1025px) { #a4-canvas { transform: scale(0.5); margin-bottom: -842px; } }
+        @media (max-width: 1024px) {
             .main-container { flex-direction: column; }
-            .sidebar { width: 100%; order: 2; margin-top: 10px; }
-            .canvas-container { order: 1; min-height: 480px; padding: 10px; }
-            #a4-canvas { transform: scale(0.55); margin-bottom: -380px; }
+            .sidebar { width: 100%; order: 2; }
+            .canvas-container { order: 1; min-height: 550px; }
+            #a4-canvas { transform: scale(0.35); margin-bottom: -1100px; }
+        }
+        @media (max-width: 500px) {
+             #a4-canvas { transform: scale(0.25); margin-bottom: -1250px; }
+             .canvas-container { min-height: 450px; padding: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <h2 style="margin: 10px 0 15px 0;">🖼️ Super 4K Collage Maker</h2>
+    <h2 style="margin: 10px 0 20px 0; text-align: center; font-weight: 800; color: #2d3748;">🔍 Super Zoom Collage (ชัดตาแตก)</h2>
 
     <div class="main-container">
         <div class="canvas-container"><div id="a4-canvas"><div class="shape-grid" id="gridContainer"></div></div></div>
         <div class="sidebar">
+            <div style="background: #edf2f7; padding: 15px; border-radius: 12px; border-left: 5px solid #3182ce; margin-bottom: 20px; font-size: 14px; color: #2d3748;">
+                💡 <b>เคล็ดลับความชัด:</b><br>ใช้รูปต้นฉบับที่ไฟล์ใหญ่และชัดเจน ยิ่งรูปต้นฉบับชัด รูปที่ได้จะยิ่งซูมได้ไกลครับ
+            </div>
             <div class="ui-group">
                 <label>1. เลือกรูปทรง</label>
                 <select id="shapeSelect">
@@ -90,9 +102,9 @@
                     <option value="0">เลข 0</option>
                 </select>
             </div>
-            <div class="ui-group"><label>2. อัปโหลดรูปภาพ</label><input type="file" id="imageInput" multiple accept="image/*"></div>
+            <div class="ui-group"><label>2. อัปโหลดรูปภาพ (เน้นไฟล์ชัดๆ)</label><input type="file" id="imageInput" multiple accept="image/*"></div>
             <div class="btn-row"><button class="btn-shuffle" onclick="shufflePhotos()">🔀 สลับที่</button><button class="btn-clear" onclick="clearPhotos()">🗑️ ล้างรูป</button></div>
-            <button class="btn-save" id="saveBtn" onclick="saveImage()">💾 บันทึกรูปชัดพิเศษ (Super 4K)</button>
+            <button class="btn-save" id="saveBtn" onclick="saveImage()">📸 บันทึกรูป (Super Zoom)</button>
         </div>
     </div>
 
@@ -173,32 +185,34 @@
     function saveImage() {
         const btn = document.getElementById('saveBtn');
         const area = document.getElementById('a4-canvas');
-        btn.innerText = "⏳ กำลังบันทึกความละเอียดสูงพิเศษ..."; btn.disabled = true;
+        btn.innerText = "⏳ กำลังเร่งความคมชัดสูงสุด... (รอ 3 วิ)"; btn.disabled = true;
         
         const originalTransform = area.style.transform;
-        area.style.transform = "none";
+        area.style.transform = "none"; // คืนค่าขนาดจริง (ใหญ่ปานกลาง)
 
-        // เพิ่มการหน่วงเวลาเป็น 2 วินาทีเพื่อให้แน่ใจว่าหน่วยความจำถูกจัดสรรเรียบร้อย
+        // เพิ่มเวลาหน่วงเป็น 2.5 วินาที เพื่อให้ระบบเตรียมภาพความละเอียดสูง
         setTimeout(() => {
             html2canvas(area, { 
-                scale: 6, // เพิ่มความชัด 2 เท่าจากเดิม (x3 -> x6 หรือ x4 -> x6)
+                scale: 4, // คูณ 4 เท่า! (นี่คือหัวใจสำคัญของความชัด)
                 useCORS: true, 
                 backgroundColor: "#ffffff", 
-                width: 595, height: 842,
-                logging: false
+                width: 1190, height: 1684,
+                logging: false,
+                allowTaint: true,
+                imageTimeout: 0, // รอโหลดรูปนานเท่าที่จำเป็น
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = `Super4K-collage-${new Date().getTime()}.png`;
+                link.download = `SuperZoom-${new Date().getTime()}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
                 area.style.transform = originalTransform;
-                btn.innerText = "💾 บันทึกรูป (Super 4K)"; btn.disabled = false;
+                btn.innerText = "📸 บันทึกรูป (Super Zoom)"; btn.disabled = false;
             }).catch(() => {
-                alert("หน่วยความจำไม่เพียงพอ กรุณาลองใหม่อีกครั้ง");
+                alert("หน่วยความจำไม่พอ (ไฟล์ใหญ่เกินไป) ลองลดจำนวนรูปลงครับ");
                 area.style.transform = originalTransform;
-                btn.innerText = "💾 บันทึกรูป (Super 4K)"; btn.disabled = false;
+                btn.disabled = false;
             });
-        }, 2000);
+        }, 2500);
     }
     build('heart');
 </script>
